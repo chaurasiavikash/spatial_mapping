@@ -1,0 +1,44 @@
+ 
+ 
+# TROPOMI Methane Pipeline Configuration
+
+# Google Earth Engine settings
+gee:
+  service_account_file: null  # Path to service account JSON file
+  project_id: "your-gee-project-id"
+  
+# Data collection parameters
+data:
+  start_date: "2023-01-01"
+  end_date: "2023-12-31"
+  region_of_interest:
+    type: "bbox"  # bbox or polygon
+    coordinates: [-95.0, 29.0, -94.0, 30.0]  # [west, south, east, north] for Houston area
+  
+# TROPOMI specific settings
+tropomi:
+  collection: "COPERNICUS/S5P/OFFL/L3_CH4"
+  quality_threshold: 0.5
+  cloud_fraction_max: 0.3
+  qa_flags: ["GOOD"]
+  
+# Detection parameters
+detection:
+  background_percentile: 50
+  anomaly_threshold: 2.0  # standard deviations
+  min_enhancement: 20.0   # ppb
+  spatial_window: 5       # pixels
+  temporal_window: 7      # days
+  
+# Output settings
+output:
+  base_path: "./data/outputs"
+  export_formats: ["geojson", "csv", "netcdf"]
+  create_plots: true
+  
+# Visualization settings
+visualization:
+  colormap: "plasma"
+  dpi: 300
+  figsize: [12, 8]
+"""
