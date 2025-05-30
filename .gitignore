@@ -335,3 +335,5 @@ report/*.fls
 
 # Just add the general LaTeX auxiliary file rules above to your existing .gitignore
 # This will automatically handle the report folder without needing folder-specific rulesgoogle-cloud-sdk/
+google-cloud-sdk/
+google-cloud-sdk/**
