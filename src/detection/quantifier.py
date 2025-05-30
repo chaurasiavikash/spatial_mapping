@@ -1,6 +1,5 @@
-
 # ============================================================================
-# FILE: src/detection/quantifier.py
+# FILE: src/detection/quantifier.py (COMPLETE VERSION)
 # ============================================================================
 import numpy as np
 import pandas as pd
@@ -84,6 +83,48 @@ class EmissionQuantifier:
             'boundary_layer_height_m': boundary_layer_height,
             'assumed_wind_speed_ms': wind_speed
         }
+    
+    def estimate_uncertainty(self, emission_estimates: pd.DataFrame) -> pd.DataFrame:
+        """Estimate uncertainty in emission quantification."""
+        logger.info("Estimating emission uncertainties")
+        
+        if emission_estimates.empty:
+            return emission_estimates
+        
+        estimates_with_uncertainty = emission_estimates.copy()
+        
+        # Simple uncertainty estimation
+        # In practice, this would be much more sophisticated
+        for idx, row in estimates_with_uncertainty.iterrows():
+            # Uncertainty sources:
+            # 1. Measurement uncertainty (TROPOMI ~1.5% for CH4)
+            # 2. Wind speed uncertainty (assumed ±50%)
+            # 3. Boundary layer height uncertainty (±30%)
+            # 4. Model uncertainty (factor of 2-3)
+            
+            measurement_uncertainty = 0.015  # 1.5%
+            wind_uncertainty = 0.5  # 50%
+            bl_height_uncertainty = 0.3  # 30%
+            model_uncertainty = 1.0  # 100%
+            
+            # Combine uncertainties (quadrature)
+            total_uncertainty = np.sqrt(
+                measurement_uncertainty**2 + 
+                wind_uncertainty**2 + 
+                bl_height_uncertainty**2 + 
+                model_uncertainty**2
+            )
+            
+            # Apply to emission rate
+            emission_rate = row['emission_rate_kg_hr']
+            uncertainty_kg_hr = emission_rate * total_uncertainty
+            
+            estimates_with_uncertainty.at[idx, 'emission_uncertainty_kg_hr'] = uncertainty_kg_hr
+            estimates_with_uncertainty.at[idx, 'emission_uncertainty_percent'] = total_uncertainty * 100
+            estimates_with_uncertainty.at[idx, 'emission_lower_bound'] = emission_rate - uncertainty_kg_hr
+            estimates_with_uncertainty.at[idx, 'emission_upper_bound'] = emission_rate + uncertainty_kg_hr
+        
+        return estimates_with_uncertainty
     
     def _ppb_to_kg_per_m2(self, concentration_ppb: float, column_height_m: float) -> float:
         """Convert methane concentration from ppb to kg/m² column density."""
