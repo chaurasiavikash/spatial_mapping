@@ -1,16 +1,12 @@
 # ============================================================================
-# FILE: .gitignore
+# TROPOMI Methane Pipeline .gitignore
 # ============================================================================
-"""
-# Byte-compiled / optimized / DLL files
+
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -31,15 +27,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
+# Testing
 htmlcov/
 .tox/
 .nox/
@@ -60,9 +48,6 @@ coverage.xml
 profile_default/
 ipython_config.py
 
-# pyenv
-.python-version
-
 # Environments
 .env
 .venv
@@ -72,27 +57,281 @@ ENV/
 env.bak/
 venv.bak/
 
-# Project specific
-data/raw/
-data/processed/
-data/outputs/
-*.log
+# ============================================================================
+# DATA FILES - NEVER COMMIT ANY DATA
+# ============================================================================
+
+# All data directories
+data/
+!data/.gitkeep
+outputs/
+results/
+
+# Satellite data files
 *.nc
 *.h5
-config/gee-service-account.json
-config/local_config.yaml
+*.hdf
+*.hdf5
+*.nc4
+*.cdf
 
-# IDE
+# Geospatial data
+*.shp
+*.shx
+*.dbf
+*.prj
+*.geojson
+*.kml
+*.kmz
+*.gpx
+
+# Image files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.tif
+
+# Large files
+*.zip
+*.tar
+*.gz
+*.bz2
+*.7z
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+logs/
+
+# ============================================================================
+# SENSITIVE CONFIGURATION - NEVER COMMIT CREDENTIALS
+# ============================================================================
+
+# Google Earth Engine credentials
+*service-account*.json
+*gee-key*.json
+*credentials*.json
+.earthengine-token
+
+# Local configuration overrides
+config/local_config.yaml
+config/local_*.yaml
+config/*_local.yaml
+
+# API keys and secrets
+.env.local
+.env.production
+.env.development
+secrets/
+keys/
+
+# ============================================================================
+# DEVELOPMENT TOOLS
+# ============================================================================
+
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# OS
+# OS files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Temporary files
-*.tmp
-*.temp
-"""
+# ============================================================================
+# PROJECT SPECIFIC
+# ============================================================================
+
+# Model outputs
+models/
+checkpoints/
+*.pkl
+*.pickle
+
+# Large result files
+*.csv
+# Exception: Keep small example files
+!examples/*.csv
+!tests/data/*.csv
+
+# Documentation builds
+docs/_build/
+docs/build/
+
+# Temporary analysis files
+scratch/
+temp/
+analysis/temp/
+
+# ============================================================================
+# WHAT TO KEEP: Only commit code, configs (without secrets), and docs
+# ============================================================================
+
+# Keep these file types:
+# *.py (Python code)
+# *.yaml (configs without secrets) 
+# *.md (documentation)
+# *.txt (requirements, etc.)
+# *.ipynb (notebooks without output)
+# *.sh (scripts)
+# Dockerfile, docker-compose.yml
+# tests/ (test code only)
+# examples/ (small example files only)
+
+# ============================================================================
+# ADD TO YOUR EXISTING .gitignore
+# ============================================================================
+
+# ============================================================================
+# LATEX FILES - Keep only source .tex and final .pdf
+# ============================================================================
+
+# LaTeX auxiliary files
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+# LaTeX intermediate files
+*.dvi
+*.xdv
+*-converted-to.*
+*.bbl
+*.bcf
+*.blg
+*-blx.aux
+*-blx.bib
+*.run.xml
+
+# LaTeX build files
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.synctex(busy)
+*.pdfsync
+
+# LaTeX Beamer
+*.nav
+*.pre
+*.snm
+*.vrb
+
+# LaTeX TikZ & PGF
+*.makefile
+*.fdb_latexmk
+*.figlist
+*.makefile
+*.figlist
+
+# LaTeX algorithm packages
+*.alg
+*.loa
+
+# LaTeX listings
+*.lol
+
+# LaTeX hyperref
+*.out
+
+# LaTeX natbib
+*.brf
+
+# LaTeX minitoc
+*.maf
+*.mlf
+*.mlt
+*.mtc[0-9]*
+*.slf[0-9]*
+*.slt[0-9]*
+*.stc[0-9]*
+
+# LaTeX glossaries
+*.acn
+*.acr
+*.glg
+*.glo
+*.gls
+*.glsdefs
+*.lzo
+*.lzs
+
+# LaTeX xindy
+*.xdy
+
+# LaTeX RevTeX
+*.end
+*.eledsec[1-9]
+*.eledsec[1-9]R
+*.eledsec[1-9][0-9]
+*.eledsec[1-9][0-9]R
+*.eledsec[1-9][0-9][0-9]
+*.eledsec[1-9][0-9][0-9]R
+
+# ============================================================================
+# REPORT FOLDER SPECIFIC RULES
+# ============================================================================
+
+# Keep only these files in report/ folder:
+# ✅ KEEP: *.tex (source files)
+# ✅ KEEP: *.bib (bibliography)  
+# ✅ KEEP: main.pdf (final output)
+# ✅ KEEP: figures/ folder (if you have one)
+# ❌ EXCLUDE: All auxiliary files listed above
+
+# If you want to be very specific about the report folder:
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.lof
+report/*.lot
+report/*.bbl
+report/*.blg
+report/*.synctex.gz
+report/*.fdb_latexmk
+report/*.fls
+
+# Keep all PDFs EXCEPT in report folder, keep only main.pdf
+*.pdf
+!report/main.pdf
+
+# OR if you want to keep all PDFs in report folder:
+# Just use the general LaTeX rules above and don't exclude PDFs
+
+# ============================================================================
+# ALTERNATIVE: Very restrictive approach for report folder
+# ============================================================================
+
+# Exclude everything in report folder except specific files:
+# report/*
+# !report/*.tex
+# !report/*.bib
+# !report/main.pdf
+# !report/figures/
+# !report/figures/**
+
+# ============================================================================
+# RECOMMENDED: Simple approach
+# ============================================================================
+
+# Just add the general LaTeX auxiliary file rules above to your existing .gitignore
+# This will automatically handle the report folder without needing folder-specific rules
