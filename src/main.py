@@ -1,5 +1,5 @@
 # ============================================================================
-# FILE: src/main.py
+# FILE: src/main.py (FIXED IMPORTS VERSION)
 # ============================================================================
 import os
 import sys
@@ -12,16 +12,27 @@ import xarray as xr
 import pandas as pd
 import numpy as np
 
-# Add src to path
-sys.path.append(str(Path(__file__).parent))
+# Fix import paths - add project root and src to path
+current_dir = Path(__file__).parent
+project_root = current_dir.parent
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(current_dir))
 
-from config.logging_config import setup_logging
-from data.downloader import TROPOMIDownloader
-from data.preprocessor import TROPOMIPreprocessor
-from detection.anomaly_detector import MethaneAnomalyDetector
-from detection.quantifier import EmissionQuantifier
-from visualization.map_plotter import MethaneMapPlotter
-from visualization.dashboard import MethaneDashboard
+# Now import our modules
+try:
+    from config.logging_config import setup_logging
+    from data.downloader import TROPOMIDownloader
+    from data.preprocessor import TROPOMIPreprocessor
+    from detection.anomaly_detector import MethaneAnomalyDetector
+    from detection.quantifier import EmissionQuantifier
+    from visualization.map_plotter import MethaneMapPlotter
+    from visualization.dashboard import MethaneDashboard
+except ImportError as e:
+    print(f"Import error: {e}")
+    print("Current working directory:", os.getcwd())
+    print("Python path:", sys.path)
+    print("Please make sure you're running from the project root directory")
+    sys.exit(1)
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +248,7 @@ def run_pipeline(config_path: str, start_date: str = None, end_date: str = None,
                     detected_dataset, time_idx=0,
                     save_path=os.path.join(viz_path, 'enhancement_map.png')
                 )
+                import matplotlib.pyplot as plt
                 plt.close(fig_enh)
                 
                 # Hotspots map if emissions detected
@@ -315,16 +327,16 @@ def main():
         epilog="""
 Examples:
   # Run with default config
-  python main.py
+  python src/main.py
   
   # Run with custom config and dates
-  python main.py --config config/config.yaml --start-date 2023-06-01 --end-date 2023-06-07
+  python src/main.py --config config/config.yaml --start-date 2023-06-01 --end-date 2023-06-07
   
   # Run and launch dashboard
-  python main.py --dashboard
+  python src/main.py --dashboard
   
   # Verbose output
-  python main.py --verbose
+  python src/main.py --verbose
         """
     )
     
@@ -382,6 +394,3 @@ Examples:
 
 if __name__ == "__main__":
     main()
-
-
-

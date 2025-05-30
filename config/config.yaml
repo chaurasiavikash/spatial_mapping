@@ -1,19 +1,21 @@
- 
- 
+# ============================================================================
+# FILE: config/config.yaml (FIXED VERSION)
+# ============================================================================
+
 # TROPOMI Methane Pipeline Configuration
 
 # Google Earth Engine settings
 gee:
   service_account_file: null  # Path to service account JSON file
-  project_id: "your-gee-project-id"
+  project_id: "your-gee-project-id"  # CHANGE THIS to your actual GEE project ID
   
 # Data collection parameters
 data:
-  start_date: "2023-01-01"
-  end_date: "2023-12-31"
+  start_date: "2023-06-01"  # Changed to shorter period for testing
+  end_date: "2023-06-07"    # Just one week for initial testing
   region_of_interest:
     type: "bbox"  # bbox or polygon
-    coordinates: [-95.0, 29.0, -94.0, 30.0]  # [west, south, east, north] for Houston area
+    coordinates: [4.0, 51.5, 5.0, 52.5]  # Netherlands region (better for your location)
   
 # TROPOMI specific settings
 tropomi:
@@ -41,4 +43,50 @@ visualization:
   colormap: "plasma"
   dpi: 300
   figsize: [12, 8]
-"""
+
+# ============================================================================
+# Additional Configuration Options for Advanced Users
+# ============================================================================
+
+# Alternative regions for testing (uncomment one to use)
+# 
+# # Houston Oil & Gas Region
+# data:
+#   region_of_interest:
+#     type: "bbox"
+#     coordinates: [-95.5, 29.0, -94.5, 30.0]
+#
+# # Permian Basin (Major Oil/Gas Region) 
+# data:
+#   region_of_interest:
+#     type: "bbox"
+#     coordinates: [-103.0, 31.5, -101.5, 33.0]
+#
+# # Los Angeles Basin
+# data:
+#   region_of_interest:
+#     type: "bbox"
+#     coordinates: [-118.5, 33.5, -117.5, 34.5]
+
+# ============================================================================
+# Configuration for your specific use case based on spatial_mapping repo
+# ============================================================================
+
+# Enhanced detection for urban/industrial areas
+# detection:
+#   background_percentile: 25      # More sensitive background
+#   anomaly_threshold: 1.8         # Lower threshold for urban areas
+#   min_enhancement: 15.0          # Catch smaller sources
+#   spatial_window: 3              # Smaller window for dense areas
+#   temporal_window: 5             # Shorter persistence requirement
+
+# High-quality output settings for research/publication
+# output:
+#   base_path: "./results"
+#   export_formats: ["geojson", "csv", "netcdf", "shapefile"]
+#   create_plots: true
+#   
+# visualization:
+#   colormap: "viridis"            # Better for scientific publications
+#   dpi: 600                       # High resolution for papers
+#   figsize: [15, 10]              # Larger figures
