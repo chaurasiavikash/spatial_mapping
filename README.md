@@ -1,282 +1,224 @@
 # TROPOMI Methane Hotspot Detection Pipeline
 
-A comprehensive Python pipeline for detecting and quantifying methane emission hotspots using TROPOMI satellite data from Google Earth Engine. This project combines atmospheric data processing, statistical anomaly detection, and emission quantification to support environmental monitoring and climate research.
+A pipeline for detecting and analyzing methane emissions using TROPOMI satellite data from Google Earth Engine. This tool helps researchers and analysts identify methane hotspots, estimate emission rates, and explore the data through an interactive dashboard.
 
-## Overview
+![Dashboard Screenshot](docs/images/dashboard_screenshot.png)
+*Interactive dashboard showing detected methane hotspots and analysis*
 
-The TROPOspheric Monitoring Instrument (TROPOMI) aboard the Sentinel-5P satellite provides daily global measurements of atmospheric methane concentrations. This pipeline automates the process of identifying statistically significant methane enhancements that may indicate emission sources such as oil and gas facilities, landfills, or other industrial activities.
+## Features
 
-### Key Features
+- **Satellite Data Access**: Works directly with TROPOMI/Sentinel-5P methane data via Google Earth Engine
+- **Hotspot Detection**: Uses statistical methods and spatial clustering to find emission sources  
+- **Emission Estimates**: Calculates emission rates using simplified atmospheric models
+- **Interactive Dashboard**: Built-in Streamlit dashboard for exploring results
+- **Time Series Analysis**: Track emission trends over time
+- **Multiple Export Options**: Save results as CSV, GeoJSON, or NetCDF files
+- **Visualization Tools**: Generate maps and plots of methane concentrations
 
-- **Automated data acquisition** from Google Earth Engine TROPOMI collections
-- **Statistical anomaly detection** using local enhancement thresholds and spatial clustering
-- **Emission quantification** with uncertainty estimation using simplified atmospheric transport models  
-- **Interactive visualizations** including maps, time series, and web-based dashboards
-- **Multi-format outputs** supporting NetCDF, CSV, and GeoJSON for downstream analysis
-- **Production-ready deployment** with Docker containerization and comprehensive testing
+## Getting Started
 
-## Scientific Background
+### What You'll Need
 
-Methane (CH₄) is the second most important anthropogenic greenhouse gas, with atmospheric concentrations that have more than doubled since pre-industrial times. Satellite-based monitoring using instruments like TROPOMI enables global-scale detection of methane emission sources, supporting both scientific research and regulatory compliance efforts.
+- Python 3.9 or newer
+- A Google Earth Engine account (free)
+- About 4-8 GB of RAM for processing
 
-The pipeline implements a multi-step detection algorithm:
-1. **Background estimation** using temporal and spatial statistical methods
-2. **Enhancement calculation** relative to local atmospheric baselines  
-3. **Statistical significance testing** using configurable z-score thresholds
-4. **Spatial clustering** to identify connected emission regions
-5. **Temporal persistence filtering** to reduce false positive detections
+### Installation
 
-## Installation
-
-### Prerequisites
-
-- Python 3.9 or higher
-- Google Earth Engine account with project access
-- Conda (recommended for environment management)
-
-### Environment Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/chaurasiavikash/spatial_mapping.git
-cd spatial_mapping
-
-# Create conda environment
-conda create -n tropomi-pipeline python=3.9 -y
-conda activate tropomi-pipeline
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Authenticate with Google Earth Engine
-earthengine authenticate
-```
-
-### Configuration
-
-1. **Set up Google Earth Engine project**:
-   - Create a project at [Google Cloud Console](https://console.cloud.google.com/)
-   - Enable the Earth Engine API for your project
-   - Note your project ID
-
-2. **Configure the pipeline**:
+1. **Clone and setup**
    ```bash
-   # Edit config/config.yaml with your settings
-   cp config/config.yaml config/local_config.yaml
-   # Update project_id and region_of_interest in local_config.yaml
+   git clone https://github.com/your-username/tropomi-methane-pipeline.git
+   cd tropomi-methane-pipeline
+   
+   # I recommend using conda
+   conda create -n tropomi-pipeline python=3.9
+   conda activate tropomi-pipeline
+   
+   pip install -r requirements.txt
    ```
 
-## Usage
+2. **Set up Google Earth Engine**
+   ```bash
+   earthengine authenticate
+   # This will open your browser to authenticate
+   ```
 
-### Quick Start
+3. **Configure the pipeline**
+   ```bash
+   # Edit config/config.yaml and add your GEE project ID
+   # You can find this in your Google Cloud Console
+   ```
 
-Test the pipeline with a small dataset:
+### Running the Pipeline
 
+**Basic run:**
 ```bash
-python src/main.py --test --verbose
+python src/main.py --start-date 2023-06-01 --end-date 2023-06-07 --verbose
 ```
 
-### Full Analysis
-
-Run analysis for a specific region and time period:
-
+**With interactive dashboard:**
 ```bash
-python src/main.py --config config/config.yaml \
-                   --start-date 2023-06-01 \
-                   --end-date 2023-06-30
+python src/main.py --dashboard --start-date 2023-06-01 --end-date 2023-06-03
 ```
 
-### Interactive Dashboard
-
-Launch the web-based dashboard for exploring results:
-
+**Quick test (uses smaller region and date range):**
 ```bash
-python src/main.py --dashboard
+python src/main.py --test
 ```
 
-### Command Line Options
+## Dashboard
 
-```bash
-python src/main.py --help
+![Dashboard Demo](docs/images/mapping_dashboard.gif)
+*Dashboard features and interactions*
 
-Options:
-  --config PATH          Configuration file path (default: config/config.yaml)
-  --start-date DATE      Start date in YYYY-MM-DD format
-  --end-date DATE        End date in YYYY-MM-DD format  
-  --dashboard           Launch interactive dashboard
-  --verbose             Enable verbose logging
-  --test                Run with test data (small region, short time)
+The dashboard gives you several ways to explore the detected methane hotspots:
+
+- **Interactive Map**: See hotspots on a map, toggle between different data views, step through time
+- **Analysis Tab**: Look at data distributions and spatial patterns  
+- **Time Series**: Watch how emissions change over time
+- **Hotspot Details**: Browse all detected hotspots, filter and sort by different criteria
+
+The dashboard automatically loads your pipeline results and lets you download the data in different formats.
+
+## How It Works
+
+The detection process has several steps:
+
+1. **Data Download**: Gets TROPOMI methane data from Google Earth Engine for your region and dates
+2. **Preprocessing**: Filters out bad data, removes clouds, calculates background concentrations
+3. **Detection**: Finds pixels with unusually high methane compared to background
+4. **Clustering**: Groups nearby high-methane pixels into hotspots
+5. **Persistence Check**: Only keeps hotspots that appear across multiple days
+6. **Emission Estimation**: Estimates emission rates using atmospheric models (simplified)
+
+The algorithm tries to be robust - if the main detection method doesn't find anything, it falls back to more sensitive approaches. This helps deal with the fact that satellite data can be patchy due to clouds and other issues.
+
+```
+tropomi-methane-pipeline/
+├── config/
+│   ├── config.yaml              # Main configuration
+│   └── logging_config.py        # Logging setup
+├── src/
+│   ├── data/
+│   │   ├── downloader.py        # TROPOMI data retrieval
+│   │   └── preprocessor.py      # Data quality and enhancement calculation
+│   ├── detection/
+│   │   ├── anomaly_detector.py  # Statistical hotspot detection
+│   │   └── quantifier.py        # Emission rate estimation
+│   ├── visualization/
+│   │   ├── dashboard.py         # Interactive Streamlit dashboard
+│   │   └── map_plotter.py       # Static visualization tools
+│   └── main.py                  # Main pipeline orchestrator
+├── notebooks/
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_detection_algorithm_development.ipynb
+│   └── 03_validation_analysis.ipynb
+├── tests/                       # Unit tests
+├── docs/                        # Documentation and images
+├── data/
+│   ├── outputs/                 # Pipeline results
+│   └── processed/               # Intermediate data
+└── README.md
 ```
 
 ## Configuration
 
-The pipeline behavior is controlled through YAML configuration files. Key parameters include:
+You can adjust the detection settings in `config/config.yaml`. The main things you might want to tweak:
 
-### Detection Parameters
 ```yaml
-detection:
-  background_percentile: 50    # Percentile for background calculation
-  anomaly_threshold: 2.0       # Z-score threshold for anomaly detection
-  min_enhancement: 20.0        # Minimum enhancement (ppb) above background
-  spatial_window: 5            # Spatial window size for local statistics
-  temporal_window: 7           # Temporal persistence requirement (days)
-```
-
-### Region of Interest
-```yaml
+# Your Google Earth Engine project ID
+gee:
+  project_id: "your-gee-project-id"
+  
+# Study area and time period
 data:
+  start_date: "2023-06-01"
+  end_date: "2023-06-07"
   region_of_interest:
     type: "bbox"
-    coordinates: [-95.0, 29.0, -94.0, 30.0]  # [west, south, east, north]
+    coordinates: [-103.0, 31.5, -101.5, 33.0]  # west, south, east, north
+
+# Detection sensitivity - lower numbers = more sensitive
+detection:
+  anomaly_threshold: 0.8        # How many standard deviations above background
+  min_enhancement: 5.0          # Minimum enhancement in ppb to consider
+  spatial_window: 3             # Smoothing window size
+  temporal_window: 3            # How many days a hotspot needs to persist
 ```
 
-## Methodology
+If you're not finding hotspots, try lowering `anomaly_threshold` to 0.5 or `min_enhancement` to 2.0.
 
-### Data Processing
+## Example Results
 
-The pipeline processes TROPOMI Level 3 methane data through several stages:
-
-1. **Quality filtering**: Removes low-quality retrievals based on QA flags and cloud coverage
-2. **Outlier removal**: Statistical filtering using interquartile range or z-score methods
-3. **Background calculation**: Temporal and spatial baseline estimation
-4. **Enhancement computation**: Difference between observed and background concentrations
-
-### Anomaly Detection
-
-Statistical anomalies are identified using a two-stage approach:
-
-1. **Local enhancement analysis**: Computing z-scores within sliding spatial windows
-2. **Significance testing**: Applying both statistical (z > threshold) and absolute (enhancement > minimum) criteria
-
-### Spatial Clustering
-
-Connected anomalous pixels are grouped using image processing techniques:
-- Connected component labeling with 8-pixel connectivity
-- Minimum cluster size filtering to reduce noise
-- Feature extraction for each identified cluster
-
-### Emission Quantification
-
-Emission rates are estimated using a simplified mass balance approach:
+When the pipeline works well, you might see output like this:
 
 ```
-E = (ΔC × A × U) / H
+SUCCESS! Detected 86 hotspots
+Total emissions: 1,247.3 kg/hr
+Results saved to: data/outputs/
+
+Top Hotspots:
+ID    Location              Enhancement    Emission Rate
+--    --------              -----------    -------------
+1     32.45°N, -102.12°W   67.3 ppb       45.2 kg/hr
+2     32.18°N, -101.89°W   52.1 ppb       38.7 kg/hr
+3     31.97°N, -102.34°W   48.9 ppb       33.1 kg/hr
 ```
 
-Where:
-- E = emission rate (kg/hr)
-- ΔC = methane enhancement (kg/m²)
-- A = source area (m²)  
-- U = wind speed (m/s)
-- H = boundary layer height (m)
+The pipeline typically detects enhancements of 5-50 ppb above background levels. Emission rate estimates should be taken with a grain of salt - they're based on simplified atmospheric models and are meant to give rough magnitudes rather than precise values.
 
-Uncertainty estimates incorporate measurement errors, meteorological variability, and model assumptions.
+## Common Issues
 
-## Output Products
+**"No hotspots detected"**
+- Try lowering the detection thresholds in config.yaml
+- Make sure your region actually has methane sources (try the Permian Basin: [-103.0, 31.5, -101.5, 33.0])
+- Check if there's data available for your time period
 
-### Data Files
-- **NetCDF**: Processed satellite data with all analysis variables
-- **CSV**: Detected hotspot features and emission estimates
-- **GeoJSON**: Geographic hotspot locations for GIS applications
+**Google Earth Engine errors**
+- Run `earthengine authenticate` again
+- Make sure your project ID is correct in config.yaml
+- Check that you have access to the TROPOMI collection
 
-### Visualizations  
-- **Enhancement maps**: Spatial distribution of methane enhancements
-- **Detection overlays**: Identified hotspots with emission estimates
-- **Time series plots**: Temporal evolution of emissions
-- **Interactive maps**: Web-based exploration interface
+**Dashboard won't start**
+- Install streamlit: `pip install streamlit plotly folium streamlit-folium`
+- Make sure you've run the main pipeline first to generate data
 
-## Validation and Testing
-
-The pipeline includes comprehensive testing capabilities:
-
-### Unit Tests
-```bash
-# Run test suite
-python -m pytest tests/
-
-# Test specific components
-python -m pytest tests/test_detector.py -v
-```
-
-### Validation Regions
-- **Clean background areas** (e.g., Netherlands) for algorithm validation
-- **Known emission sources** (e.g., Permian Basin, oil fields) for sensitivity testing
-- **Urban areas** (e.g., Los Angeles) for complex source scenarios
-
-## Performance and Limitations
-
-### Computational Performance
-- Processing time: ~2-5 minutes for weekly regional analysis
-- Memory requirements: ~2-4 GB for typical datasets
-- Google Earth Engine quotas: 15,000 requests/day (non-commercial use)
-
-### Detection Limitations
-- **Spatial resolution**: Limited by TROPOMI pixel size (~7×3.5 km)
-- **Sensitivity threshold**: Minimum detectable sources ~1-10 tonnes CH₄/hr
-- **Atmospheric conditions**: Reduced sensitivity under high cloud cover
-- **Transport modeling**: Simplified assumptions may affect emission estimates
+**Memory issues**
+- Try a smaller region or shorter time period
+- The pipeline needs about 4-8 GB RAM for typical regions
 
 ## Contributing
 
-Contributions are welcome! Please follow these guidelines:
+If you'd like to contribute, feel free to open issues or submit pull requests. Some areas where help would be especially useful:
 
-1. Fork the repository and create a feature branch
-2. Add tests for new functionality
-3. Ensure code follows PEP 8 style guidelines  
-4. Update documentation for any API changes
-5. Submit a pull request with a clear description
-
-### Development Setup
-```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Run code formatting
-black src/ tests/
-flake8 src/ tests/
-
-# Run full test suite
-pytest tests/ --cov=src
-```
-
-## Citation
-
-If you use this pipeline in your research, please cite:
-
-```bibtex
-@software{chaurasia2024tropomi,
-  author = {Chaurasia, Vikash},
-  title = {TROPOMI Methane Hotspot Detection Pipeline},
-  year = {2024},
-  url = {https://github.com/chaurasiavikash/spatial_mapping},
-  note = {Software for satellite-based methane emission detection}
-}
-```
+- Improving the detection algorithms
+- Adding support for other satellite datasets  
+- Better emission rate estimation methods
+- More visualization options
+- Testing on different regions and time periods
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see LICENSE file for details.
 
 ## Acknowledgments
 
-- **ESA/Copernicus** for TROPOMI satellite data
-- **Google Earth Engine** platform for data access and processing
-- **SRON Netherlands Institute for Space Research** for TROPOMI algorithm development
-- **TU Delft** Department of Biomechanical Engineering for institutional support
+- ESA/Copernicus for the TROPOMI data
+- Google Earth Engine team for the excellent data platform
+- The atmospheric science community for methods and validation
 
-## Contact
+## Citation
 
-**Vikash Chaurasia**  
-Postdoctoral Researcher  
-TU Delft, Netherlands  
-Email: chaurasiavik@gmail.com  
-GitHub: [@chaurasiavikash](https://github.com/chaurasiavikash)
+If this helps with your research, you can cite it as:
 
-## Related Publications
-
-- Lorente, A., et al. (2021). Methane retrieved from TROPOMI: improvement of the data product and validation of the first 2 years of measurements. *Atmospheric Measurement Techniques*, 14(1), 665-684.
-- Jacob, D. J., et al. (2022). Quantifying methane emissions from the global scale down to point sources using satellite observations of atmospheric methane. *Atmospheric Chemistry and Physics*, 22(14), 9617-9645.
+```bibtex
+@software{tropomi_methane_pipeline,
+  title={TROPOMI Methane Hotspot Detection Pipeline},
+  author={Chaurasia, Vikash},
+  year={2025},
+  url={https://github.com/your-username/tropomi-methane-pipeline}
+}
+```
 
 ---
-
-For technical support, feature requests, or collaboration opportunities, please open an issue on GitHub or contact the maintainer directly.
+ 

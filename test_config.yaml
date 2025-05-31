@@ -1,0 +1,25 @@
+# Quick test configuration
+gee:
+  project_id: "sodium-lore-456715-i3"
+data:
+  start_date: "2023-06-01"
+  end_date: "2023-06-07"
+  region_of_interest:
+    type: "bbox"
+    coordinates: [-103.0, 31.5, -101.5, 33.0]
+tropomi:
+  collection: "COPERNICUS/S5P/OFFL/L3_CH4"
+detection:
+  background_percentile: 50
+  anomaly_threshold: 0.5    # Very low
+  min_enhancement: 1.0      # Very low
+  spatial_window: 3
+  temporal_window: 2
+output:
+  base_path: "./data/outputs"
+  export_formats: ["csv"]
+  create_plots: true
+visualization:
+  colormap: "plasma"
+  dpi: 150
+  figsize: [10, 6]

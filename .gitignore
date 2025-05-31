@@ -286,6 +286,12 @@ analysis/temp/
 *.eledsec[1-9][0-9][0-9]
 *.eledsec[1-9][0-9][0-9]R
 
+
+# Allow documentation images and demos
+!docs/images/*.png
+!docs/images/*.jpg
+!docs/images/*.gif
+!docs/images/*.svg
 # ============================================================================
 # REPORT FOLDER SPECIFIC RULES
 # ============================================================================

@@ -1,47 +1,37 @@
-# ============================================================================
-# FILE: config/config.yaml (FIXED WITH YOUR PROJECT ID)
-# ============================================================================
+# TROPOMI Configuration - Optimized for your actual data
+# Based on analysis showing enhancements up to ~60 ppb
 
-# TROPOMI Methane Pipeline Configuration
-
-# Google Earth Engine settings
 gee:
-  service_account_file: null  
-  project_id: "sodium-lore-456715-i3"  # CHANGE THIS to your actual project ID
+  service_account_file: null
+  project_id: "sodium-lore-456715-i3"
   
-# Data collection parameters
 data:
   start_date: "2023-06-01"
-  end_date: "2023-06-03" 
+  end_date: "2023-06-07"
   region_of_interest:
     type: "bbox"
-    #coordinates: [4.0, 51.5, 5.0, 52.5]  # Netherlands region
-    coordinates: [-103.0, 31.5, -101.5, 33.0]  # texas
-
+    coordinates: [-103.0, 31.5, -101.5, 33.0]
   
-# TROPOMI specific settings
 tropomi:
   collection: "COPERNICUS/S5P/OFFL/L3_CH4"
-  quality_threshold: 0.5
-  cloud_fraction_max: 0.3
-  qa_flags: ["GOOD"]
+  quality_threshold: 0.1
+  cloud_fraction_max: 0.8
+  qa_flags: ["GOOD", "MEDIUM"]
   
-# Detection parameters
+# Detection parameters - Tuned for your data showing max ~60 ppb enhancements
 detection:
   background_percentile: 50
-  anomaly_threshold: 1
-  min_enhancement: 10.0
-  spatial_window: 5
-  temporal_window: 7
+  anomaly_threshold: 0.5      # Very low - only 0.5 std deviations
+  min_enhancement: 5.0        # Based on your data showing clear >5 ppb areas
+  spatial_window: 3
+  temporal_window: 2          # Reduced - only need to appear in 2+ time steps
   
-# Output settings
 output:
   base_path: "./data/outputs"
-  export_formats: ["geojson", "csv", "netcdf"]
+  export_formats: ["csv", "geojson"]
   create_plots: true
   
-# Visualization settings
 visualization:
   colormap: "plasma"
-  dpi: 300
-  figsize: [12, 8]
+  dpi: 150
+  figsize: [10, 6]
